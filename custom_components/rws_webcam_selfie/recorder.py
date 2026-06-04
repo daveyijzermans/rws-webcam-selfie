@@ -97,7 +97,12 @@ class ProximityRecorder:
     @property
     def _media_root(self) -> Path:
         subdir = self.entry.options.get(CONF_MEDIA_SUBDIR, DEFAULT_MEDIA_SUBDIR)
-        return Path(self.hass.config.path("media")) / subdir
+        # Prefer the root the built-in `local` media source browses (e.g. /media
+        # on HA OS), so recordings appear under "Media -> My media" without
+        # extra YAML. Fall back to <config>/media if it isn't configured.
+        local = self.hass.config.media_dirs.get("local")
+        base = Path(local) if local else Path(self.hass.config.path("media"))
+        return base / subdir
 
     # ------------------------------------------------------------------- start
     async def async_start(self) -> None:
