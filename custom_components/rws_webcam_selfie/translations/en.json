@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "RWS Webcam Selfie",
+        "description": "Pick the device tracker that follows you (typically your phone or car) and tune the trigger radius. A recording will start whenever the tracker enters the radius of an enabled webcam, and stop when it leaves.",
+        "data": {
+          "device_tracker": "Device tracker",
+          "radius": "Trigger radius (m)",
+          "max_duration": "Max recording duration (s)",
+          "enabled_cameras": "Enabled cameras",
+          "media_subdir": "Media subdirectory",
+          "ffmpeg_path": "ffmpeg binary path"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "RWS Webcam Selfie is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "RWS Webcam Selfie options",
+        "data": {
+          "radius": "Trigger radius (m)",
+          "max_duration": "Max recording duration (s)",
+          "enabled_cameras": "Enabled cameras",
+          "media_subdir": "Media subdirectory",
+          "ffmpeg_path": "ffmpeg binary path"
+        }
+      }
+    }
+  },
+  "services": {
+    "start_recording": {
+      "name": "Start recording",
+      "description": "Manually start recording a specific RWS webcam."
+    },
+    "stop_recording": {
+      "name": "Stop recording",
+      "description": "Stop an in-progress recording."
+    }
+  }
+}

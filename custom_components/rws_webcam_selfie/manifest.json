@@ -1,0 +1,13 @@
+{
+  "domain": "rws_webcam_selfie",
+  "name": "RWS Webcam Selfie",
+  "version": "0.1.0",
+  "documentation": "https://github.com/daveyijzermans/rws-webcam-selfie",
+  "issue_tracker": "https://github.com/daveyijzermans/rws-webcam-selfie/issues",
+  "codeowners": ["@daveyijzermans"],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "integration_type": "service",
+  "requirements": [],
+  "dependencies": ["ffmpeg", "stream"]
+}

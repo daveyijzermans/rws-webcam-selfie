@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "RWS Webcam Selfie",
+        "description": "Kies de device tracker die je volgt (meestal je telefoon of auto) en stel de triggerradius in. Zodra de tracker binnen de radius van een ingeschakelde webcam komt start een opname, die stopt zodra je de radius weer verlaat.",
+        "data": {
+          "device_tracker": "Device tracker",
+          "radius": "Triggerradius (m)",
+          "max_duration": "Maximale opnameduur (s)",
+          "enabled_cameras": "Actieve camera's",
+          "media_subdir": "Mediasubmap",
+          "ffmpeg_path": "ffmpeg pad"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "RWS Webcam Selfie is al geconfigureerd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "RWS Webcam Selfie opties",
+        "data": {
+          "radius": "Triggerradius (m)",
+          "max_duration": "Maximale opnameduur (s)",
+          "enabled_cameras": "Actieve camera's",
+          "media_subdir": "Mediasubmap",
+          "ffmpeg_path": "ffmpeg pad"
+        }
+      }
+    }
+  },
+  "services": {
+    "start_recording": {
+      "name": "Opname starten",
+      "description": "Start handmatig een opname van een specifieke RWS webcam."
+    },
+    "stop_recording": {
+      "name": "Opname stoppen",
+      "description": "Stop een lopende opname."
+    }
+  }
+}

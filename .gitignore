@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+cams.json
+cams_resolved.json
+cameras_block.txt
+.venv/
+.claude/settings.local.json

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__3174aa3f-da06-449c-a092-434bad7f8472__GetLiveContext",
+      "Bash(curl -s *)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "Bash(mkdir -p *)",
+      "mcp__node-red__get_flows"
+    ]
+  }
+}

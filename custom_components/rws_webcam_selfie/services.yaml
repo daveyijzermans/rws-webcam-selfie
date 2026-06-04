@@ -1,0 +1,40 @@
+start_recording:
+  name: Start recording
+  description: Manually start recording a specific RWS webcam to media.
+  fields:
+    camera_id:
+      name: Camera ID
+      description: Numeric RWS camera id (see the camera entity attributes).
+      required: true
+      example: 4
+      selector:
+        number:
+          min: 1
+          max: 9999
+          mode: box
+    duration:
+      name: Duration
+      description: Optional recording duration in seconds (overrides the configured max).
+      required: false
+      example: 60
+      selector:
+        number:
+          min: 5
+          max: 1800
+          unit_of_measurement: s
+          mode: box
+
+stop_recording:
+  name: Stop recording
+  description: Stop an in-progress recording for the given camera.
+  fields:
+    camera_id:
+      name: Camera ID
+      description: Numeric RWS camera id.
+      required: true
+      example: 4
+      selector:
+        number:
+          min: 1
+          max: 9999
+          mode: box
