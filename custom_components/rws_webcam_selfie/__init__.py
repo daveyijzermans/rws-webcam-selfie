@@ -15,6 +15,7 @@ from homeassistant.const import Platform
 from .const import DOMAIN
 from .recorder import ProximityRecorder
 from .services import async_register_services, async_unregister_services
+from .views import RWSWebcamProxyView
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +24,12 @@ PLATFORMS: list[Platform] = [Platform.CAMERA, Platform.BINARY_SENSOR]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up RWS Webcam Selfie from a config entry."""
-    hass.data.setdefault(DOMAIN, {})
+    domain_data = hass.data.setdefault(DOMAIN, {})
+
+    # Register the HLS proxy view exactly once, the first time any entry loads.
+    if not domain_data.get("_view_registered"):
+        hass.http.register_view(RWSWebcamProxyView(hass))
+        domain_data["_view_registered"] = True
 
     recorder = ProximityRecorder(hass, entry)
     await recorder.async_start()
@@ -42,7 +48,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
     if data:
         await data["recorder"].async_stop()
-    if not hass.data[DOMAIN]:
+    # Drop housekeeping flag when the last entry is gone.
+    remaining = {k: v for k, v in hass.data[DOMAIN].items() if not k.startswith("_")}
+    if not remaining:
         async_unregister_services(hass)
     return unload_ok
 

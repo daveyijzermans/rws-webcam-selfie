@@ -6,8 +6,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.network import get_url
 
-from .const import CAMERAS, CONF_ENABLED_CAMERAS, DOMAIN, hls_url
+from .const import CAMERAS, CONF_ENABLED_CAMERAS, DOMAIN
+from .views import camera_proxy_path
 
 
 async def async_setup_entry(
@@ -32,14 +34,6 @@ class RWSWebcamCamera(Camera):
         self._entry_id = entry.entry_id
         self._attr_unique_id = f"{DOMAIN}_camera_{cam['id']}"
         self._attr_name = f"{cam['road']} {cam['near']}"
-        # stream.inmoves.nl 404s without a Referer header. PyAV (used by HA's
-        # stream component) takes the headers via this options dict.
-        self.stream_options = {
-            "headers": (
-                "Referer: https://www.rwsverkeersinfo.nl/\r\n"
-                "User-Agent: Mozilla/5.0\r\n"
-            ),
-        }
         self._attr_extra_state_attributes = {
             "camera_id": cam["id"],
             "road": cam["road"],
@@ -58,4 +52,14 @@ class RWSWebcamCamera(Camera):
         )
 
     async def stream_source(self) -> str | None:
-        return hls_url(self._cam)
+        # stream.inmoves.nl requires a Referer header that PyAV cannot send,
+        # so we point at our in-process proxy view which adds the header.
+        base = get_url(
+            self.hass,
+            allow_internal=True,
+            allow_external=False,
+            allow_ip=True,
+            require_current_request=False,
+            prefer_external=False,
+        )
+        return f"{base}{camera_proxy_path(self._cam)}"
