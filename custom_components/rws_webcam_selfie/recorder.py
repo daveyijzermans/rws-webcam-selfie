@@ -96,13 +96,14 @@ class ProximityRecorder:
 
     @property
     def _media_root(self) -> Path:
+        """Directory under the HA config dir where recordings are stored.
+
+        Kept out of `media_dirs` deliberately so recordings don't pollute the
+        user-owned "My media" tile — the integration exposes them through its
+        own MediaSource tile instead (see media_source.py).
+        """
         subdir = self.entry.options.get(CONF_MEDIA_SUBDIR, DEFAULT_MEDIA_SUBDIR)
-        # Prefer the root the built-in `local` media source browses (e.g. /media
-        # on HA OS), so recordings appear under "Media -> My media" without
-        # extra YAML. Fall back to <config>/media if it isn't configured.
-        local = self.hass.config.media_dirs.get("local")
-        base = Path(local) if local else Path(self.hass.config.path("media"))
-        return base / subdir
+        return Path(self.hass.config.path(subdir))
 
     # ------------------------------------------------------------------- start
     async def async_start(self) -> None:

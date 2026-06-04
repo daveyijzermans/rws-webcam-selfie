@@ -19,6 +19,9 @@ yourself doing exactly that.
    (`/media/rws_webcam_selfie/` by default — visible in the Media browser).
 5. The recording stops as soon as the tracker leaves the radius, or after a
    safety-cap duration (default 3 min), whichever comes first.
+6. Recordings are exposed as their own tile in the HA Media browser
+   ("RWS Webcam Selfie"), with HTTP Range support so seeking inside an MP4
+   works.
 
 The live streams use HLS with stream copy, so CPU cost is negligible — no
 re-encoding.
@@ -50,7 +53,7 @@ directory and restart.
 | Trigger radius | 2000 m | Recording starts when distance ≤ radius. |
 | Max recording duration | 180 s | Hard cap so a stale tracker can't record forever. |
 | Enabled cameras | All 26 | Multi-select. |
-| Media subdirectory | `rws_webcam_selfie` | Created under HA's media folder. |
+| Media subdirectory | `rws_webcam_selfie` | Created under HA's config dir (e.g. `/config/rws_webcam_selfie/`). Browsed through the integration's own Media tile. |
 | ffmpeg path | `ffmpeg` | Override if not on PATH. |
 
 ## Entities

@@ -9,5 +9,5 @@
   "iot_class": "cloud_polling",
   "integration_type": "service",
   "requirements": [],
-  "dependencies": ["ffmpeg", "stream"]
+  "dependencies": ["ffmpeg", "stream", "media_source"]
 }
