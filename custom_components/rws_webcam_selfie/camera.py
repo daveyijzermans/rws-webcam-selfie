@@ -32,6 +32,14 @@ class RWSWebcamCamera(Camera):
         self._entry_id = entry.entry_id
         self._attr_unique_id = f"{DOMAIN}_camera_{cam['id']}"
         self._attr_name = f"{cam['road']} {cam['near']}"
+        # stream.inmoves.nl 404s without a Referer header. PyAV (used by HA's
+        # stream component) takes the headers via this options dict.
+        self.stream_options = {
+            "headers": (
+                "Referer: https://www.rwsverkeersinfo.nl/\r\n"
+                "User-Agent: Mozilla/5.0\r\n"
+            ),
+        }
         self._attr_extra_state_attributes = {
             "camera_id": cam["id"],
             "road": cam["road"],
