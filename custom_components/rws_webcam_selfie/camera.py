@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 # Snapshots are only there so map pins / camera cards aren't blank — the image
 # content has no functional value. Keep upstream hits very rare to stay polite
 # to stream.inmoves.nl and avoid being flagged for automated scraping.
-SNAPSHOT_CACHE_TTL = 30 * 60  # seconds
+SNAPSHOT_CACHE_TTL = 3 * 60 * 60  # seconds
 
 
 async def async_setup_entry(
