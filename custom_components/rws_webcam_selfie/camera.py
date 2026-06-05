@@ -27,6 +27,7 @@ class RWSWebcamCamera(Camera):
 
     _attr_supported_features = CameraEntityFeature.STREAM
     _attr_has_entity_name = True
+    _attr_icon = "mdi:cctv"
 
     def __init__(self, entry: ConfigEntry, cam: dict) -> None:
         super().__init__()
