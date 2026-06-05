@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import time
 
 from aiohttp import ClientTimeout
 
@@ -17,6 +18,11 @@ from .const import CAMERAS, CONF_ENABLED_CAMERAS, DOMAIN
 from .views import UPSTREAM_HEADERS, camera_proxy_path
 
 _LOGGER = logging.getLogger(__name__)
+
+# Snapshots are only there so map pins / camera cards aren't blank — the image
+# content has no functional value. Keep upstream hits very rare to stay polite
+# to stream.inmoves.nl and avoid being flagged for automated scraping.
+SNAPSHOT_CACHE_TTL = 30 * 60  # seconds
 
 
 async def async_setup_entry(
@@ -40,6 +46,8 @@ class RWSWebcamCamera(Camera):
         super().__init__()
         self._cam = cam
         self._entry_id = entry.entry_id
+        self._snapshot_bytes: bytes | None = None
+        self._snapshot_fetched_at: float = 0.0
         self._attr_unique_id = f"{DOMAIN}_camera_{cam['id']}"
         self._attr_name = f"{cam['road']} {cam['near']}"
         self._attr_extra_state_attributes = {
@@ -62,11 +70,19 @@ class RWSWebcamCamera(Camera):
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
-        """Fetch the latest static JPEG snapshot.
+        """Return the JPEG snapshot, refreshing at most once per TTL window.
 
-        Without this, HA's auto-generated entity_picture points at the camera
-        proxy with no actual image bytes — which makes the map pin render blank.
+        Snapshots only exist so the map pin / camera card thumbnail isn't
+        blank; staleness doesn't matter. We cache aggressively to avoid
+        hammering stream.inmoves.nl.
         """
+        now = time.monotonic()
+        if (
+            self._snapshot_bytes is not None
+            and now - self._snapshot_fetched_at < SNAPSHOT_CACHE_TTL
+        ):
+            return self._snapshot_bytes
+
         session = async_get_clientsession(self.hass)
         try:
             async with session.get(
@@ -79,11 +95,17 @@ class RWSWebcamCamera(Camera):
                         "Snapshot for cam %s returned HTTP %s",
                         self._cam["id"], resp.status,
                     )
-                    return None
-                return await resp.read()
+                    # Keep serving the previous image (if any) until the
+                    # next TTL window — don't fall through to None.
+                    self._snapshot_fetched_at = now
+                    return self._snapshot_bytes
+                self._snapshot_bytes = await resp.read()
+                self._snapshot_fetched_at = now
+                return self._snapshot_bytes
         except Exception as err:  # noqa: BLE001
             _LOGGER.debug("Snapshot fetch failed for cam %s: %s", self._cam["id"], err)
-            return None
+            self._snapshot_fetched_at = now
+            return self._snapshot_bytes
 
     async def stream_source(self) -> str | None:
         # stream.inmoves.nl requires a Referer header that PyAV cannot send,
