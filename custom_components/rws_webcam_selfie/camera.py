@@ -1,15 +1,22 @@
 """Camera entities for each enabled RWS webcam."""
 from __future__ import annotations
 
+import logging
+
+from aiohttp import ClientTimeout
+
 from homeassistant.components.camera import Camera, CameraEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.network import get_url
 
 from .const import CAMERAS, CONF_ENABLED_CAMERAS, DOMAIN
-from .views import camera_proxy_path
+from .views import UPSTREAM_HEADERS, camera_proxy_path
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -51,6 +58,32 @@ class RWSWebcamCamera(Camera):
             model="Motorway webcam",
             configuration_url=cam["embed_url"],
         )
+
+    async def async_camera_image(
+        self, width: int | None = None, height: int | None = None
+    ) -> bytes | None:
+        """Fetch the latest static JPEG snapshot.
+
+        Without this, HA's auto-generated entity_picture points at the camera
+        proxy with no actual image bytes — which makes the map pin render blank.
+        """
+        session = async_get_clientsession(self.hass)
+        try:
+            async with session.get(
+                self._cam["static_url"],
+                headers=UPSTREAM_HEADERS,
+                timeout=ClientTimeout(total=10),
+            ) as resp:
+                if resp.status != 200:
+                    _LOGGER.debug(
+                        "Snapshot for cam %s returned HTTP %s",
+                        self._cam["id"], resp.status,
+                    )
+                    return None
+                return await resp.read()
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.debug("Snapshot fetch failed for cam %s: %s", self._cam["id"], err)
+            return None
 
     async def stream_source(self) -> str | None:
         # stream.inmoves.nl requires a Referer header that PyAV cannot send,
