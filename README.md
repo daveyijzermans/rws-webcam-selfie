@@ -50,7 +50,7 @@ directory and restart.
 | Option | Default | Notes |
 | --- | --- | --- |
 | Device tracker | — | Any `device_tracker.*` with lat/lon attributes (Home Assistant Companion app works great). |
-| Trigger radius | 2000 m | Recording starts when distance ≤ radius. |
+| Trigger radius | 1000 m | Recording starts when distance ≤ radius. |
 | Max recording duration | 180 s | Hard cap so a stale tracker can't record forever. |
 | Enabled cameras | All 26 | Multi-select. |
 | Media subdirectory | `rws_webcam_selfie` | Created under HA's config dir (e.g. `/config/rws_webcam_selfie/`). Browsed through the integration's own Media tile. |

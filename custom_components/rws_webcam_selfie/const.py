@@ -10,7 +10,7 @@ CONF_ENABLED_CAMERAS = "enabled_cameras"
 CONF_MEDIA_SUBDIR = "media_subdir"
 CONF_FFMPEG_PATH = "ffmpeg_path"
 
-DEFAULT_RADIUS = 2000  # metres
+DEFAULT_RADIUS = 1000  # metres
 DEFAULT_MAX_DURATION = 180  # seconds, safety cap
 DEFAULT_MEDIA_SUBDIR = "rws_webcam_selfie"
 DEFAULT_FFMPEG_PATH = "ffmpeg"
